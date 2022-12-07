@@ -212,8 +212,59 @@ void avl_tree::display(avl_node *ptr, int level) {
         if (ptr == root)
             cout << "Root -> ";
         for (i = 0; i < level && ptr != root; i++)
-            cout << "        ";
+            cout << "\n";
         cout << ptr->data;
         display(ptr->left, level + 1);
+    }
+}
+
+/**
+ * @brief avl_tree::preorder Funcion para mostrar el arbol en preorden
+ *
+ * @param temp
+ */
+void avl_tree::preorder(avl_node *temp) {
+    if (root == NULL) {
+        cout << "El arbol esta vacio" << endl;
+        return;
+    }
+    if (temp != NULL) {
+        cout << temp->data << " ";
+        preorder(temp->left);
+        preorder(temp->right);
+    }
+}
+
+/**
+ * @brief avl_tree::inorder Funcion para mostrar el arbol en inorden
+ *
+ * @param temp
+ */
+void avl_tree::inorder(avl_node *temp) {
+    if (root == NULL) {
+        cout << "El arbol esta vacio" << endl;
+        return;
+    }
+    if (temp != NULL) {
+        inorder(temp->left);
+        cout << temp->data << " ";
+        inorder(temp->right);
+    }
+}
+
+/**
+ * @brief avl_tree::postorder Funcion para mostrar el arbol en postorden
+ *
+ * @param temp
+ */
+void avl_tree::postorder(avl_node *temp) {
+    if (root == NULL) {
+        cout << "El arbol esta vacio" << endl;
+        return;
+    }
+    if (temp != NULL) {
+        postorder(temp->left);
+        postorder(temp->right);
+        cout << temp->data << " ";
     }
 }
