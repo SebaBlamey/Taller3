@@ -11,6 +11,7 @@ int getVecPos(vector<string>, string);
 
 struct avl_node {
     int data;
+    int id;
     avl_node *left;
     avl_node *right;
 } * root;
@@ -18,6 +19,23 @@ struct avl_node {
 /**
  *  declaramos el arbol
  */
+
+
+class mes{
+    private:
+        string nombre;
+        int peso;
+    public:
+        mes(string nombre,int peso){
+            this->nombre = nombre;
+            this->peso = peso;
+        }
+        string imprimir(){
+            cout << "Mes: " << nombre << "Pesos: " << peso << endl; 
+        }
+        
+};
+
 class avl_tree {
    public:
     int height(avl_node *);
@@ -27,11 +45,11 @@ class avl_tree {
     avl_node *lr_rotation(avl_node *);
     avl_node *rl_rotation(avl_node *);
     avl_node *balance(avl_node *);
-    avl_node *insert(avl_node *, int);
+    avl_node *insert(avl_node *, int,int);
     void display(avl_node *, int);
-    void inorder(avl_node *);
-    void preorder(avl_node *);
-    void postorder(avl_node *);
+    void inorder(avl_node *,vector<string>);
+    void preorder(avl_node *,vector<string>);
+    void postorder(avl_node *,vector<string>);
     avl_tree() {
         root = NULL;
     }
@@ -39,9 +57,11 @@ class avl_tree {
 
 int main() {
     // obtener el root del avl
+ 
     avl_tree avl;
     vector<string> meses = {"enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"};
     vector<string> abecedario = {"a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"};
+    vector<int> pesos = {0,0,0,0,0,0,0,0,0,0,0,0};
     for (int i = 0; i < meses.size(); i++) {
         string mes = meses[i];
         int total = 0;
@@ -50,16 +70,54 @@ int main() {
             int pos = getVecPos(abecedario, string(1, letra));
             total += pos;
         }
+        
+        
+        pesos[i] = total;
         cout << total << endl;
-        root = avl.insert(root, total);
+        
         //avl.display(root, 1);
 
     }
+    for (int i = 0; i < meses.size(); i++)
+    {
+       for (int j = i+1; j < meses.size(); j++)
+       {
+        if(pesos[i] == pesos[j]){
+            pesos[j] = pesos[i] - 1;
+        }
+       }
+       root = avl.insert(root, pesos[i],i);
+    }
+    
+   
+
+    cout << "---------ALGORITMO HINDU DE COMPARACION------------"<<endl;
+    for (int i = 0; i < meses.size(); i++)
+    {
+        cout << pesos[i] <<endl;
+    }
+    cout << "---------------------"<<endl;
+
+
     if (root == NULL) {
         cout << "El arbol esta vacio" << endl;
     } else {
         avl.display(root, 1);
     }
+
+   cout << endl;
+    cout << "IN ORDER" << endl << "------------" << endl;
+    avl.inorder(root,meses);
+    cout <<endl;
+    cout <<endl;
+    cout << "PRE ORDER" << endl << "------------" << endl;
+    avl.preorder(root,meses);
+    cout <<endl;
+    cout <<endl;
+    cout << "POST ORDER" << endl << "------------" << endl;
+    avl.postorder(root,meses);
+    cout <<endl;
+    cout <<endl;
     return 0;
 }
 int getVecPos(vector<string> arr, string name) {
@@ -184,18 +242,19 @@ avl_node *avl_tree::balance(avl_node *temp) {
  * @param value
  * @return avl_node*
  */
-avl_node *avl_tree::insert(avl_node *root, int value) {
+avl_node *avl_tree::insert(avl_node *root, int value,int id) {
     if (root == NULL) {
         root = new avl_node;
         root->data = value;
         root->left = NULL;
         root->right = NULL;
+        root->id = id;
         return root;
     } else if (value < root->data) {
-        root->left = insert(root->left, value);
+        root->left = insert(root->left, value,id);
         root = balance(root);
     } else if (value >= root->data) {
-        root->right = insert(root->right, value);
+        root->right = insert(root->right, value,id);
         root = balance(root);
     }
     return root;
@@ -212,7 +271,7 @@ void avl_tree::display(avl_node *ptr, int level) {
         if (ptr == root)
             cout << "Root -> ";
         for (i = 0; i < level && ptr != root; i++)
-            cout << "\n";
+            cout << "        ";
         cout << ptr->data;
         display(ptr->left, level + 1);
     }
@@ -223,15 +282,15 @@ void avl_tree::display(avl_node *ptr, int level) {
  *
  * @param temp
  */
-void avl_tree::preorder(avl_node *temp) {
+void avl_tree::preorder(avl_node *temp,vector<string> meses) {
     if (root == NULL) {
         cout << "El arbol esta vacio" << endl;
         return;
     }
     if (temp != NULL) {
-        cout << temp->data << " ";
-        preorder(temp->left);
-        preorder(temp->right);
+        cout << meses[temp->id] << " ";
+        preorder(temp->left,meses);
+        preorder(temp->right,meses);
     }
 }
 
@@ -240,15 +299,15 @@ void avl_tree::preorder(avl_node *temp) {
  *
  * @param temp
  */
-void avl_tree::inorder(avl_node *temp) {
+void avl_tree::inorder(avl_node *temp,vector<string> meses) {
     if (root == NULL) {
         cout << "El arbol esta vacio" << endl;
         return;
     }
     if (temp != NULL) {
-        inorder(temp->left);
-        cout << temp->data << " ";
-        inorder(temp->right);
+        inorder(temp->left,meses);
+        cout << meses[temp->id] << " ";
+        inorder(temp->right,meses);
     }
 }
 
@@ -257,14 +316,14 @@ void avl_tree::inorder(avl_node *temp) {
  *
  * @param temp
  */
-void avl_tree::postorder(avl_node *temp) {
+void avl_tree::postorder(avl_node *temp,vector<string> meses) {
     if (root == NULL) {
         cout << "El arbol esta vacio" << endl;
         return;
     }
     if (temp != NULL) {
-        postorder(temp->left);
-        postorder(temp->right);
-        cout << temp->data << " ";
+        postorder(temp->left,meses);
+        postorder(temp->right,meses);
+        cout << meses[temp->id] << " ";
     }
 }
